@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<EmailServicesFunction xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apexClass>UptiqAIFileUploadHandler</apexClass>
+    <attachmentOption>All</attachmentOption>
+    <authenticationFailureAction>Discard</authenticationFailureAction>
+    <authorizationFailureAction>Discard</authorizationFailureAction>
+    <emailServicesAddresses>
+        <authorizedSenders>anup@cloudkaptan.com</authorizedSenders>
+        <developerName>uptiqAI</developerName>
+        <isActive>true</isActive>
+        <localPart>uptiqaifileupload</localPart>
+        <runAsUser>anup.biswas+cktestingv2@cloudkaptan.com</runAsUser>
+    </emailServicesAddresses>
+    <functionInactiveAction>Discard</functionInactiveAction>
+    <functionName>UptiqAIFileUpload</functionName>
+    <isActive>true</isActive>
+    <isAuthenticationRequired>false</isAuthenticationRequired>
+    <isErrorRoutingEnabled>false</isErrorRoutingEnabled>
+    <isTextAttachmentsAsBinary>false</isTextAttachmentsAsBinary>
+    <isTlsRequired>false</isTlsRequired>
+    <overLimitAction>Discard</overLimitAction>
+</EmailServicesFunction>

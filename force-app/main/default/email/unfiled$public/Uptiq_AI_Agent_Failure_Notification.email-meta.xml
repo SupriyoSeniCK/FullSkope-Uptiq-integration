@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<EmailTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
+    <available>true</available>
+    <description>This template can be used to notify users of a failure in the UPTIQ AI Document Rule Validation Agent with exception details</description>
+    <encodingKey>UTF-8</encodingKey>
+    <name>Uptiq AI Agent Failure Notification</name>
+    <style>none</style>
+    <subject>UPTIQ Agent Processing Notification</subject>
+    <textOnly>Dear User,
+
+This is to inform you that the UPTIQ AI Document Rule Validation Agent encountered a failure during processing.
+
+If you are unsure how to interpret this message, please reach out to the assistance team for support.
+
+Best regards,  
+FullSkope Team</textOnly>
+    <type>custom</type>
+    <uiType>Aloha</uiType>
+</EmailTemplate>

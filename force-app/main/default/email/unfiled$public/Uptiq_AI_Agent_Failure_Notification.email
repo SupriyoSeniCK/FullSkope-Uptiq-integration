@@ -1,0 +1,27 @@
+<html>
+  <body style="font-family: Arial, sans-serif; font-size: 14px; color: #333;">
+    <p>Dear User,</p>
+
+    <p>
+      This is to inform you that the 
+      <strong>UPTIQ AI Document Rule Validation Agent</strong> encountered a failure during processing.
+    </p>
+
+    <p>Please find the exception message below:</p>
+
+    <blockquote style="background-color: #f9f9f9; border-left: 5px solid #ccc; padding: 10px;">
+      {!errorMessage}
+    </blockquote>
+
+    <p>
+      If you are unsure how to interpret this message, please reach out to the assistance team for support.
+    </p>
+
+    <br/>
+
+    <p>
+      Best regards,<br/>
+      FullSkope Team
+    </p>
+  </body>
+</html>
