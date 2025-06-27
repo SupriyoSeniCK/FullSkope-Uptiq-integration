@@ -4,7 +4,7 @@
  *                      consistency, maintainability, and to avoid hardcoded values throughout the codebase.
  * @author            : Supriyo Seni
  * @group             : Constant class
- * @last modified on  : 06-26-2025
+ * @last modified on  : 06-27-2025
  * @last modified by  : Supriyo Seni
 **/
 public inherited sharing class UptiqAIConstants {
@@ -53,7 +53,11 @@ public inherited sharing class UptiqAIConstants {
     public static final String ORG_WIDE_EMAIL_ADDRESS = 'case-support@fullskope.com';
     public static final String GENERIC_ERROR_MESSAGE = 'Something Went Wrong. Please contact your admin';
     public static final String FAILURE_NOTIFICATION_EMAIL_TEMPLATE = 'Uptiq_AI_Agent_Failure_Notification';
+    public static final String SUCCESS_NOTIFICATION_EMAIL_TEMPLATE = 'Uptiq_Validation_Complete_Success_Email';
     public static final String ERROR_MESSAGE_MEREGE_FIELD = '{!errorMessage}';
+    public static final String CONDITION_MEREGE_FIELD = '{!loanConditionName}';
+    public static final String RECORD_URL_MEREGE_FIELD = '{!recordUrl}';
+    public static final String USER_NAME_MEREGE_FIELD = '{!User.FirstName}';
     public static final String UNIQUE_STRING = '@#';
 
     // String Utilities - Common string literals and delimiters used throughout the system
@@ -62,6 +66,8 @@ public inherited sharing class UptiqAIConstants {
     public static final String UNDERSCORE = '_';
     public static final String COLON = ':';
     public static final String DASH = '-';
+    public static final String DASH_WITH_SPACE = ' - ';
+    public static final String SLASH = '/';
     public static final String BLANK_STRING = '';
     public static final String UNDERSCORE_ID = '_id';
     public static final String ID_STRING = 'id';

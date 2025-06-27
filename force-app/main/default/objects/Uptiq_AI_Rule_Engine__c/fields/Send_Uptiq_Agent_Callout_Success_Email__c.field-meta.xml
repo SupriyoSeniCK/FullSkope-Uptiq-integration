@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Send_Uptiq_Agent_Callout_Success_Email__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>This field can be used to send UPTIQ AI Agent callout success email</description>
+    <label>Send Uptiq Agent Callout Success Email</label>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

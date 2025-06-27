@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<EmailTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
+    <available>true</available>
+    <description>Sends a confirmation email after a document is processed by the Uptiq AI Agent, notifying that rule results have been updated successfully in Salesforce.</description>
+    <encodingKey>UTF-8</encodingKey>
+    <name>Uptiq Validation Complete Success Email</name>
+    <style>none</style>
+    <subject>Document Validation Completed &amp; Rules Updated</subject>
+    <type>custom</type>
+    <uiType>Aloha</uiType>
+</EmailTemplate>

@@ -2,7 +2,7 @@
  * @description       : This class contains utility methods for Uptiq AI
  * @author            : Supriyo Seni
  * @group             : Util Class
- * @last modified on  : 06-25-2025
+ * @last modified on  : 06-27-2025
  * @last modified by  : Supriyo Seni
 **/
 public inherited sharing class UptiqAIUtil {
@@ -123,5 +123,60 @@ public inherited sharing class UptiqAIUtil {
 
         // Return default value (120000 ms) if not configured or out of range
         return  UptiqAIConstants.MAX_TIME_OUT_LIMIT;
+    }
+
+    /**
+    * @description 
+    * @author Supriyo Seni | 06-27-2025 
+    * @param loanConditionObj 
+    **/
+    public static void sendSuccessEmail(FullSkope__Loan_Condition__c loanConditionObj) {
+        try {
+            if(!Uptiq_AI_Rule_Engine__c.getInstance().Send_Uptiq_Agent_Callout_Success_Email__c){
+                return; // Exit if success email sending is disabled
+            }
+            // Fetch the failure notification email template
+            List<EmailTemplate> emailTemplateList = [SELECT Id, 
+                                                            Name, 
+                                                            HtmlValue, 
+                                                            subject, 
+                                                            DeveloperName
+                                                        FROM EmailTemplate
+                                                        WHERE DeveloperName =: UptiqAIConstants.SUCCESS_NOTIFICATION_EMAIL_TEMPLATE
+                                                        WITH SYSTEM_MODE
+                                                        LIMIT 1];
+
+            if (emailTemplateList.isEmpty()) {
+                return; // Exit if template is not found
+            }
+
+            String body = emailTemplateList[0].HtmlValue;
+            body = body.replace(UptiqAIConstants.CONDITION_MEREGE_FIELD, String.valueOf(loanConditionObj.Name));
+            body = body.replace(UptiqAIConstants.RECORD_URL_MEREGE_FIELD, String.valueOf(URL.getOrgDomainURL().toExternalForm()
+                    + UptiqAIConstants.SLASH + loanConditionObj.Id));
+            body = body.replace(UptiqAIConstants.USER_NAME_MEREGE_FIELD, UserInfo.getFirstName());
+
+            // Set up the email object
+            Messaging.SingleEmailMessage mailObj = new Messaging.SingleEmailMessage();
+            mailObj.setToAddresses(new List<String>{'supriyo.seni@cloudkaptan.com'});
+            mailObj.setHtmlBody(body);
+            mailObj.setSubject(loanConditionObj.Name + UptiqAIConstants.DASH_WITH_SPACE + emailTemplateList[0].subject);
+            // Set org-wide email address if available
+            List<OrgWideEmailAddress> orgEmailList = [SELECT Id 
+                                                        FROM OrgWideEmailAddress
+                                                        WHERE Address = :UptiqAIConstants.ORG_WIDE_EMAIL_ADDRESS
+                                                        AND IsVerified = true
+                                                        WITH SYSTEM_MODE
+                                                        LIMIT 1];
+            if (!orgEmailList.isEmpty()) {
+                mailObj.setOrgWideEmailAddressId(orgEmailList[0].Id);
+            }
+
+            // Send the email
+            Messaging.sendEmail(new Messaging.SingleEmailMessage[] { mailObj });
+
+        } catch (Exception e) {
+            return; // Silently handle any exceptions during email sending
+        }
     }
 }

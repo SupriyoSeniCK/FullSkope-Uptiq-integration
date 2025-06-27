@@ -63,7 +63,7 @@ public inherited sharing class UptiqAISignedURLController {
             mailObj.setPlainTextBody(signedURLInst.signedUrl + UptiqAIConstants.UNIQUE_STRING + versionObj.Id);
             // Send the email
             Messaging.sendEmail(new Messaging.SingleEmailMessage[] { mailObj });
-            return signedURLInst.storageId;
+            return null;
         }else if (heapUsed >= heapLimit*3){
             // Throw exception if the document size is greater than 36 MB
             throw new CustomException('Document size exceeds the allowed limit (36 MB) for processing. Document Id :' + versionObj.Id);

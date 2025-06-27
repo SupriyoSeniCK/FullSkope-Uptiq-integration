@@ -28,6 +28,8 @@ global class UptiqAIRuleValidationBatch implements Database.Batchable<sObject>, 
     // This list is maintained across batch executions due to Database.Stateful
     List<String> storageIdList = new List<String>();
 
+    private Boolean isEmailServicePathTaken = false;
+
     /**
     * @description | Constructor to initialize the batch class with required inputs
     * @author Supriyo Seni | 06-13-2025 
@@ -44,7 +46,12 @@ global class UptiqAIRuleValidationBatch implements Database.Batchable<sObject>, 
         this.signedUrlParserList = signedUrlParserList;
     }
 
-    // Start method defines what records to process - returns the list of documents
+    /**
+    * @description | Start method defines what records to process - returns the list of documents
+    * @author Supriyo Seni | 06-26-2025 
+    * @param bc 
+    * @return Database.querylocator 
+    **/
     public Database.querylocator start(Database.BatchableContext bc){
 
         return Database.getQueryLocator([SELECT Id, 
@@ -71,12 +78,18 @@ global class UptiqAIRuleValidationBatch implements Database.Batchable<sObject>, 
         try { 
             // Generate storage ID for the current document by uploading it to the AI system
             // Uses the corresponding signed URL response from the list based on docCountMatchIndex
-            String storageId = UptiqAISignedURLController.getUptiqStorageId(loanConditionObj.Id, contentVersionObj, signedUrlParserList[docCountMatchIndex]);
+            UptiqAISignedURLController.UptiqAISignedURLResponseParser signedurlParserInst =  signedUrlParserList[docCountMatchIndex];
+            String storageId = UptiqAISignedURLController.getUptiqStorageId(loanConditionObj.Id, contentVersionObj,signedurlParserInst);
             
             // Add the storage ID to the list if it was successfully generated
             // This storage ID will be used to reference the document in AI agent requests
             if (String.isNotBlank(storageId)) {
                 storageIdList.add(storageId);
+            }else {
+                // If the email service path was taken, we do not add the storage ID to the list
+                // This is because the file upload will be handled by the email service instead
+                isEmailServicePathTaken = true;
+                storageIdList.add(signedurlParserInst.storageId);
             }
 
             // Increment counter to process the next document and its corresponding signed URL response
@@ -95,30 +108,35 @@ global class UptiqAIRuleValidationBatch implements Database.Batchable<sObject>, 
     * @param bc - Batch context
     **/
     public void finish(Database.BatchableContext bc) {
-        // Storage ID validation check
+        // Storage ID validation check if we miss any documents
         if(storageIdList.size() != documentIdList.size()){
             return;
         }
-        // Create instance of the AI agent callout class to initiate rule validation
-        UptiqAIAgentCallout uptiqAIAgentCalloutInst = new UptiqAIAgentCallout();
-        try {
-            // Initiate the AI agent callout with the loan condition and all collected storage IDs
-            // This will send the documents and rules to the AI agent for validation
-            uptiqAIAgentCalloutInst.initiateCallout(loanConditionObj, storageIdList);
-        } catch (Exception excepInst) {
-            // Handle specific timeout scenarios with retry logic
-            if (excepInst.getMessage().contains(UptiqAIConstants.READ_TIME_OUT) && uptiqAIAgentCalloutInst.transactionId != null) {
-                // Get retry delay configuration from custom settings (default to 5 minutes if not set)
-                Integer delayInMins = Integer.valueOf(Uptiq_AI_Rule_Engine__c.getInstance().Uptiq_Retry_Delay_In_Minutes__c ?? 5);
-                
-                // Enqueue a retry job with the specified delay using the transaction ID from the failed request
-                // This allows the system to attempt to retrieve results from the AI agent later
-                System.enqueueJob(new UptiqAICalloutRetryQueueable(uptiqAIAgentCalloutInst.transactionId, loanConditionObj.Id), delayInMins);         
-            } else {
-                // For non-timeout errors, log the error and send notification
-                Database.insert(UptiqAIUtil.createUptiqAIErrorLog(excepInst, UptiqAIRuleValidationBatch.class.getName(), new List<String>{loanConditionObj.Id}));
-                UptiqAIUtil.sendFailureEmail(excepInst.getMessage());
-            }
+        if(isEmailServicePathTaken){
+            System.enqueueJob(new UptiqAIAgentCalloutQueueable(loanConditionObj,storageIdList),1);
+        }else{
+            System.enqueueJob(new UptiqAIAgentCalloutQueueable(loanConditionObj,storageIdList));
         }
+        // // Create instance of the AI agent callout class to initiate rule validation
+        // UptiqAIAgentCallout uptiqAIAgentCalloutInst = new UptiqAIAgentCallout();
+        // try {
+        //     // Initiate the AI agent callout with the loan condition and all collected storage IDs
+        //     // This will send the documents and rules to the AI agent for validation
+        //     uptiqAIAgentCalloutInst.initiateCallout(loanConditionObj, storageIdList);
+        // } catch (Exception excepInst) {
+        //     // Handle specific timeout scenarios with retry logic
+        //     if (excepInst.getMessage().contains(UptiqAIConstants.READ_TIME_OUT) && uptiqAIAgentCalloutInst.transactionId != null) {
+        //         // Get retry delay configuration from custom settings (default to 5 minutes if not set)
+        //         Integer delayInMins = Integer.valueOf(Uptiq_AI_Rule_Engine__c.getInstance().Uptiq_Retry_Delay_In_Minutes__c ?? 5);
+                
+        //         // Enqueue a retry job with the specified delay using the transaction ID from the failed request
+        //         // This allows the system to attempt to retrieve results from the AI agent later
+        //         System.enqueueJob(new UptiqAICalloutRetryQueueable(uptiqAIAgentCalloutInst.transactionId, loanConditionObj.Id), delayInMins);         
+        //     } else {
+        //         // For non-timeout errors, log the error and send notification
+        //         Database.insert(UptiqAIUtil.createUptiqAIErrorLog(excepInst, UptiqAIRuleValidationBatch.class.getName(), new List<String>{loanConditionObj.Id}));
+        //         UptiqAIUtil.sendFailureEmail(excepInst.getMessage());
+        //     }
+        // }
     }
 }
